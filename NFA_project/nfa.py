@@ -271,7 +271,8 @@ table_x = table
 
 add(table,end)
 print_t(table)
-
+print()
+print()
 
 
 
@@ -282,7 +283,6 @@ print_t(table)
 
 
 ## the nfa diagram will be drawn here
-print(table_x)
 
 # create a 2d numpy array of dtype = object with the dimensions (states x states) and initialize it by "-"
 str_array = np.full((len(table_x)-1, len(table_x)-1), "-", dtype=object)
@@ -316,7 +316,7 @@ for i in range(1,len(table_x)-1):
                 str_array[i-1][b[k]-1] = str_array[i-1][b[k]-1] + ",b"
     
 print (str_array)
-
+print()
 
 # let's draw the graph
 # import MarkovChain
@@ -337,6 +337,7 @@ str_array = np.where(str_array == "e,a", 0.4, str_array)
 str_array = np.where(str_array == "b,e", 0.5, str_array)
 str_array = np.where(str_array == "e,b", 0.5, str_array)
 print (str_array)
+print()
 mc = MarkovChain(str_array, states)
 
 
