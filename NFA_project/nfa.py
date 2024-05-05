@@ -1,3 +1,4 @@
+import numpy as np
 
 inp = '(a|b)*.a.b.b'    #input("")
 print ('input regular expression : ' , inp)
@@ -264,5 +265,80 @@ def add(c,e):
 start,cur,end,table = mod_table(inp,start,cur,end,table)
 ttograph=table
 
+# take a copy of the table for the drawing of the graph
+table_x = table
+
+
 add(table,end)
 print_t(table)
+
+
+
+
+
+
+
+
+
+
+## the nfa diagram will be drawn here
+print(table_x)
+
+# create a 2d numpy array of dtype = object with the dimensions (states x states) and initialize it by "-"
+str_array = np.full((len(table_x)-1, len(table_x)-1), "-", dtype=object)
+
+for i in range(1,len(table_x)-1):
+    epsilon = table_x[i][1]
+    # if the epsilon is a number stored as string then we convert that string to a int
+    if len(epsilon) == 1:
+        epsilon = int(epsilon)
+        str_array[i-1][epsilon-1] = "e"
+    else:
+        for k in range (len(epsilon)):
+            if epsilon != "-":
+                str_array[i-1][epsilon[k]-1] = "e"
+    
+    a = table_x[i][2]
+    for k in range (len(a)):
+        if a != '-':
+            # append tha value of a to the str_array at the position i-1 and a[k]-1 and seperate the values by comma
+            if str_array[i-1][a[k]-1] == "-":
+                str_array[i-1][a[k]-1] = "a"
+            else:
+                str_array[i-1][a[k]-1] = str_array[i-1][a[k]-1] + ",a"
+    b = table_x[i][3]
+    for k in range (len(b)):
+        if b != '-':
+            # append tha value of b to the str_array at the position i-1 and b[k]-1 and seperate the values by comma
+            if str_array[i-1][b[k]-1] == "-":
+                str_array[i-1][b[k]-1] = "b"
+            else:
+                str_array[i-1][b[k]-1] = str_array[i-1][b[k]-1] + ",b"
+    
+print (str_array)
+
+
+# let's draw the graph
+# import MarkovChain
+from markovchain import MarkovChain
+# create an array of strings with the states from 1 to the number of states in the table
+states = [str(i) for i in range(1, len(table_x))]
+
+# create a copy of the str_array but replace each unique element with a number from 0 to the number of unique elements
+# make it a generic code
+str_array = np.where(str_array == "-", 0, str_array)
+str_array = np.where(str_array == "e", 1, str_array)
+str_array = np.where(str_array == "a", 0.1, str_array)
+str_array = np.where(str_array == "b", 0.2, str_array)
+str_array = np.where(str_array == "a,b", 0.3, str_array)
+str_array = np.where(str_array == "b,a", 0.3, str_array)
+str_array = np.where(str_array == "a,e", 0.4, str_array)
+str_array = np.where(str_array == "e,a", 0.4, str_array)
+str_array = np.where(str_array == "b,e", 0.5, str_array)
+str_array = np.where(str_array == "e,b", 0.5, str_array)
+print (str_array)
+mc = MarkovChain(str_array, states)
+
+
+# draw the graph
+mc.draw()
