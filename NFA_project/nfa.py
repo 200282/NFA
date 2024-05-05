@@ -290,13 +290,11 @@ str_array = np.full((len(table_x)-1, len(table_x)-1), "-", dtype=object)
 for i in range(1,len(table_x)-1):
     epsilon = table_x[i][1]
     # if the epsilon is a number stored as string then we convert that string to a int
-    if len(epsilon) == 1:
-        epsilon = int(epsilon)
-        str_array[i-1][epsilon-1] = "e"
-    else:
+    if len(epsilon) > 1:
         for k in range (len(epsilon)):
             if epsilon != "-":
-                str_array[i-1][epsilon[k]-1] = "e"
+                if i != (epsilon[k]):
+                    str_array[i-1][epsilon[k]-1] = "e"
     
     a = table_x[i][2]
     for k in range (len(a)):
