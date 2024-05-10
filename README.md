@@ -4,6 +4,11 @@ recursively evaluates it to make a non-deterministic finite automata .
 
 Supports the three classic regular expression operations :
 
-1)Concatenation
-2)Union
-3)Kleene closure
+1)Concatenation   ab
+
+2)Union           a|b
+
+3)Kleene closure   a*
+
+4)positive closure  b+
+
