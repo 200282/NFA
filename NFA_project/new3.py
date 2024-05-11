@@ -190,11 +190,23 @@ def printTransitionTable(finite_automata):
     printStateTransitions(finite_automata[0], [], {finite_automata[0]: 0})
 
 
-# def to_transition_table(t):
+
 
 
 # to positive closure
-
+def check(st):
+    v=0
+    for i in range(len(st)):
+       if st[i]=='+':
+           v=1
+           break
+    if v==1:
+        print('have')   
+        cv=convert(input)      
+        r=positive(cv)  
+        return r
+    else:
+        return st 
 
 def convert(s):
     ms = []
@@ -244,12 +256,10 @@ def validate_regex(pattern):
         print("Invalid regular expression.")
         exit(1)
 
-
-input = "xy(ab)+"
+#input regular expression
+input = "x(y(ab))*"
 validate_regex(input)
-
-cv = convert(input)
-r = positive(cv)
+r=check(input)
 
 print(r)
 
