@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
+
 class Type:
     SYMBOL = 1
     CONCAT = 2
@@ -234,8 +236,18 @@ def positive(t):
     print('output', out)
     return out
 
+def validate_regex(pattern):
+    try:
+        re.compile(pattern)
+        print("Regular expression is valid.")
+    except re.error:
+        print("Invalid regular expression.")
+        exit(1)
+
 
 input = "xy(ab)+"
+validate_regex(input)
+
 cv = convert(input)
 r = positive(cv)
 
