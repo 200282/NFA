@@ -81,27 +81,37 @@ def constructTree(regexp):
         check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
                                          bg_color="black")
         tkinter.messagebox.showerror("Information", "your RE is not VALID")
-        # Wait for 5 seconds
+        # Wait for 2 seconds
         time.sleep(2)
-        # Run exit(1) after the 5-second delay
+        # Run exit(1) after the 2-second delay
         exit(1)
 
 
 
 def inorder(et):
-    if et._type == Type.SYMBOL:
-        print(et.value)
-    elif et._type == Type.CONCAT:
-        inorder(et.left)
-        print(".")
-        inorder(et.right)
-    elif et._type == Type.UNION:
-        inorder(et.left)
-        print("+")
-        inorder(et.right)
-    elif et._type == Type.KLEENE:
-        inorder(et.left)
-        print("*")
+    try :
+        if et._type == Type.SYMBOL:
+            print(et.value)
+        elif et._type == Type.CONCAT:
+            inorder(et.left)
+            print(".")
+            inorder(et.right)
+        elif et._type == Type.UNION:
+            inorder(et.left)
+            print("+")
+            inorder(et.right)
+        elif et._type == Type.KLEENE:
+            inorder(et.left)
+            print("*")
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",bg_color="black")
+        tkinter.messagebox.showerror("Information", "your RE is not VALID")
+        # Wait for 2 seconds
+        time.sleep(2)
+        exit(1)
 
 
 def higherPrecedence(a, b):
@@ -110,43 +120,56 @@ def higherPrecedence(a, b):
 
 
 def postfix(regexp):
-    # adding dot "." between consecutive symbols
-    temp = []
-    for i in range(len(regexp)):
-        if i != 0 \
-                and (regexp[i - 1].isalpha() or regexp[i - 1] == ")" or regexp[i - 1] == "*") \
-                and (regexp[i].isalpha() or regexp[i] == "("):
-            temp.append(".")
-        temp.append(regexp[i])
-    regexp = temp
+    try :
+        # adding dot "." between consecutive symbols
+        temp = []
+        for i in range(len(regexp)):
+            if i != 0 \
+                    and (regexp[i - 1].isalpha() or regexp[i - 1] == ")" or regexp[i - 1] == "*") \
+                    and (regexp[i].isalpha() or regexp[i] == "("):
+                temp.append(".")
+            temp.append(regexp[i])
+        regexp = temp
 
-    stack = []
-    output = ""
+        stack = []
+        output = ""
 
-    for c in regexp:
-        if c.isalpha():
-            output = output + c
-            continue
+        for c in regexp:
+            if c.isalpha():
+                output = output + c
+                continue
 
-        if c == ")":
-            while len(stack) != 0 and stack[-1] != "(":
-                output = output + stack.pop()
-            stack.pop()
-        elif c == "(":
-            stack.append(c)
-        elif c == "*":
-            output = output + c
-        elif len(stack) == 0 or stack[-1] == "(" or higherPrecedence(c, stack[-1]):
-            stack.append(c)
-        else:
-            while len(stack) != 0 and stack[-1] != "(" and not higherPrecedence(c, stack[-1]):
-                output = output + stack.pop()
-            stack.append(c)
+            if c == ")":
+                while len(stack) != 0 and stack[-1] != "(":
+                    output = output + stack.pop()
+                stack.pop()
+            elif c == "(":
+                stack.append(c)
+            elif c == "*":
+                output = output + c
+            elif len(stack) == 0 or stack[-1] == "(" or higherPrecedence(c, stack[-1]):
+                stack.append(c)
+            else:
+                while len(stack) != 0 and stack[-1] != "(" and not higherPrecedence(c, stack[-1]):
+                    output = output + stack.pop()
+                stack.append(c)
 
-    while len(stack) != 0:
-        output = output + stack.pop()
+        while len(stack) != 0:
+            output = output + stack.pop()
 
-    return output
+        return output
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
+
 
 
 class FiniteAutomataState:
@@ -157,80 +180,153 @@ class FiniteAutomataState:
 def evalRegex(et):
     # returns equivalent E-NFA for given expression tree (representing a Regular
     # Expression)
-    if et._type == Type.SYMBOL:
-        return evalRegexSymbol(et)
-    elif et._type == Type.CONCAT:
-        return evalRegexConcat(et)
-    elif et._type == Type.UNION:
-        return evalRegexUnion(et)
-    elif et._type == Type.KLEENE:
-        return evalRegexKleene(et)
+    try :
+        if et._type == Type.SYMBOL:
+            return evalRegexSymbol(et)
+        elif et._type == Type.CONCAT:
+            return evalRegexConcat(et)
+        elif et._type == Type.UNION:
+            return evalRegexUnion(et)
+        elif et._type == Type.KLEENE:
+            return evalRegexKleene(et)
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 def evalRegexSymbol(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
+    try :
+        start_state = FiniteAutomataState()
+        end_state = FiniteAutomataState()
 
-    start_state.next_state[et.value] = [end_state]
-    return start_state, end_state
+        start_state.next_state[et.value] = [end_state]
+        return start_state, end_state
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 def evalRegexConcat(et):
-    left_nfa = evalRegex(et.left)
-    right_nfa = evalRegex(et.right)
+    try :
+        left_nfa = evalRegex(et.left)
+        right_nfa = evalRegex(et.right)
 
-    left_nfa[1].next_state['epsilon'] = [right_nfa[0]]
+        left_nfa[1].next_state['epsilon'] = [right_nfa[0]]
 
-    return left_nfa[0], right_nfa[1]
+        return left_nfa[0], right_nfa[1]
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 def evalRegexUnion(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
+    try :
+        start_state = FiniteAutomataState()
+        end_state = FiniteAutomataState()
 
-    up_nfa = evalRegex(et.left)
-    down_nfa = evalRegex(et.right)
+        up_nfa = evalRegex(et.left)
+        down_nfa = evalRegex(et.right)
 
-    start_state.next_state['epsilon'] = [up_nfa[0], down_nfa[0]]
-    up_nfa[1].next_state['epsilon'] = [end_state]
-    down_nfa[1].next_state['epsilon'] = [end_state]
+        start_state.next_state['epsilon'] = [up_nfa[0], down_nfa[0]]
+        up_nfa[1].next_state['epsilon'] = [end_state]
+        down_nfa[1].next_state['epsilon'] = [end_state]
 
-    return start_state, end_state
+        return start_state, end_state
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 def evalRegexKleene(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
+    try :
+        start_state = FiniteAutomataState()
+        end_state = FiniteAutomataState()
 
-    sub_nfa = evalRegex(et.left)
+        sub_nfa = evalRegex(et.left)
 
-    start_state.next_state['epsilon'] = [sub_nfa[0], end_state]
-    sub_nfa[1].next_state['epsilon'] = [sub_nfa[0], end_state]
+        start_state.next_state['epsilon'] = [sub_nfa[0], end_state]
+        sub_nfa[1].next_state['epsilon'] = [sub_nfa[0], end_state]
 
-    return start_state, end_state
+        return start_state, end_state
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 t = [["state", 'symbol', 'next state']]
 
 
 def printStateTransitions(state, states_done, symbol_table):
-    if state in states_done:
-        return
+    try :
+        if state in states_done:
+            return
 
-    states_done.append(state)
+        states_done.append(state)
 
-    for symbol in list(state.next_state):
-        line_output = "s" + str(symbol_table[state]) + "\t\t" + symbol + "\t\t\t"
+        for symbol in list(state.next_state):
+            line_output = "s" + str(symbol_table[state]) + "\t\t" + symbol + "\t\t\t"
 
-        for ns in state.next_state[symbol]:
-            if ns not in symbol_table:
-                symbol_table[ns] = 1 + sorted(symbol_table.values())[-1]
-            line_output = line_output + "s" + str(symbol_table[ns]) + " "
-            t.append([str(symbol_table[state]), symbol, str(symbol_table[ns])])
-        print(line_output)
+            for ns in state.next_state[symbol]:
+                if ns not in symbol_table:
+                    symbol_table[ns] = 1 + sorted(symbol_table.values())[-1]
+                line_output = line_output + "s" + str(symbol_table[ns]) + " "
+                t.append([str(symbol_table[state]), symbol, str(symbol_table[ns])])
+            print(line_output)
 
-        for ns in state.next_state[symbol]:
-            printStateTransitions(ns, states_done, symbol_table)
+            for ns in state.next_state[symbol]:
+                printStateTransitions(ns, states_done, symbol_table)
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
+
 
 
 def printTransitionTable(finite_automata):
@@ -240,58 +336,94 @@ def printTransitionTable(finite_automata):
 
 # to positive closure
 def check(st):
-    v=0
-    for i in range(len(st)):
-       if st[i]=='+':
-           v=1
-           break
-    if v==1:
-        print('have')
-        cv=convert(input)
-        r=positive(cv)
-        return r
-    else:
-        return st
+    try :
+        v = 0
+        for i in range(len(st)):
+            if st[i] == '+':
+                v = 1
+                break
+        if v == 1:
+            print('have')
+            cv = convert(input)
+            r = positive(cv)
+            return r
+        else:
+            return st
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 def convert(s):
-    ms = []
-    f = 0
-    for i in range(len(s)):
-        if s[i] == "(":
-            x = i
-            f = 1
+    try :
+        ms = []
+        f = 0
+        for i in range(len(s)):
+            if s[i] == "(":
+                x = i
+                f = 1
 
-        if s[i] == ")":
-            y = i
-            ms.append(s[x:y + 1])
-            f = 0
+            if s[i] == ")":
+                y = i
+                ms.append(s[x:y + 1])
+                f = 0
 
-        if f == 0:
-            ms.append(s[i])
-    ms = list(filter(lambda x: x != ')', ms))
-    return ms
+            if f == 0:
+                ms.append(s[i])
+        ms = list(filter(lambda x: x != ')', ms))
+        return ms
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+        #                                  bg_color="black")
+        tkinter.messagebox.showerror("Information", str(e))
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 def positive(t):
-    for i in range(len(t)):
+   try :
+       for i in range(len(t)):
 
-        if t[i] == '+':
+           if t[i] == '+':
 
-            ele = t.pop(i - 1)
-            ele = ele + ele + '*'
-            t.insert(i - 1, ele)
+               ele = t.pop(i - 1)
+               ele = ele + ele + '*'
+               t.insert(i - 1, ele)
 
-        else:
-            pass
+           else:
+               pass
 
-    out = ''
-    t = list(filter(lambda x: x != '+', t))
-    print('t', t)
-    for i in range(len(t)):
-        out = out + t[i]
+       out = ''
+       t = list(filter(lambda x: x != '+', t))
+       print('t', t)
+       for i in range(len(t)):
+           out = out + t[i]
 
-    print('output', out)
-    return out
+       print('output', out)
+       return out
+   except Exception as e:
+       # Handle any type of exception that might occur
+       print(f"An error occurred: {type(e).__name__}")
+       print(f"Error message: {str(e)}")
+       # check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+       #                                  bg_color="black")
+       tkinter.messagebox.showerror("Information", str(e))
+       # Wait for 5 seconds
+       time.sleep(2)
+       # Run exit(1) after the 5-second delay
+       exit(1)
 
 
 
@@ -641,6 +773,18 @@ def read_file():
             entry_box.insert(0, words.pop(0))
         except IndexError :
             tkinter.messagebox.showerror("Information", "You have drawn all RE in File")
+        except Exception as e:
+            # Handle any type of exception that might occur
+            print(f"An error occurred: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+                                             bg_color="black")
+            tkinter.messagebox.showerror("Information", "your RE is not VALID")
+            # # Wait for 2 seconds
+            # time.sleep(2)
+            # exit(1)
+
+
 
     read_next_RE = ctk.CTkButton(master=app, text="NEXT RE", font=('Times', 16),command=next_re)  #TODO :, command=read_exp
     read_next_RE.place(relx=0.65,rely=0.9)
