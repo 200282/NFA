@@ -13,6 +13,8 @@ import tkinter as tk
 from tkinter import Label
 from tkinter import filedialog
 from PIL import Image, ImageTk
+import time
+
 
 import re
 
@@ -52,26 +54,37 @@ class ExpressionTree:
 
 
 def constructTree(regexp):
-    stack = []
-    for c in regexp:
-        if c.isalpha():
-            stack.append(ExpressionTree(Type.SYMBOL, c))
-        else:
-            if c == "|":
-                z = ExpressionTree(Type.UNION)
-                z.right = stack.pop()
-                z.left = stack.pop()
-            elif c == ".":
-                z = ExpressionTree(Type.CONCAT)
-                z.right = stack.pop()
-                z.left = stack.pop()
-            elif c == "*":
-                z = ExpressionTree(Type.KLEENE)
-                z.left = stack.pop()
-            stack.append(z)
+    try :
+        stack = []
+        for c in regexp:
+            if c.isalpha():
+                stack.append(ExpressionTree(Type.SYMBOL, c))
+            else:
+                if c == "|":
+                    z = ExpressionTree(Type.UNION)
+                    z.right = stack.pop()
+                    z.left = stack.pop()
+                elif c == ".":
+                    z = ExpressionTree(Type.CONCAT)
+                    z.right = stack.pop()
+                    z.left = stack.pop()
+                elif c == "*":
+                    z = ExpressionTree(Type.KLEENE)
+                    z.left = stack.pop()
+                stack.append(z)
 
-    return stack[0]
-
+        return stack[0]
+    except Exception as e:
+        # Handle any type of exception that might occur
+        print(f"An error occurred: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        check_validation_label.configure(text="your RE is not VALID", font=('Times', 12), fg_color="red",
+                                         bg_color="black")
+        tkinter.messagebox.showerror("Information", "your RE is not VALID")
+        # Wait for 5 seconds
+        time.sleep(2)
+        # Run exit(1) after the 5-second delay
+        exit(1)
 
 
 
@@ -363,12 +376,18 @@ def contrust_dataframe() :
     updated_item_list = []
     updated_item_list = group_inner_list(items)
     print("updated_item_list",updated_item_list)
+    first_states = set()
+    last_states = set()
+    # Add nodes and edges
+    for start, label, end in items:
+        first_states.add(start)
 
     # Iterate over the items and update the DataFrame
     for item in updated_item_list:
         current_state, symbol, next_state = item
         current_state = int(current_state)
         symbol = (symbol[0],)
+        last_states = {items[-1] for items in items if items[-1] not in first_states}
         #
         for col in df.columns:
             # print(symbol, col[0])
@@ -394,6 +413,19 @@ def contrust_dataframe() :
 
     df.reset_index(drop=True, inplace=True)
     print(df)
+
+    last_states = {items[-1] for items in items if items[-1] not in first_states}
+    if len(last_states) == 1:
+        last_states =list(last_states)
+        print(last_states)
+        df.loc[-1,"state"] = last_states[0]
+        df.loc[-1,"epsilon"] = last_states[0]
+
+    df.fillna('-', inplace=True)  # Fill null values with '-'
+    # print(df)
+
+    df.reset_index(drop=True, inplace=True)
+    print("from contrust_dataframe" , df)
 
     # Save the DataFrame as a CSV file
     df.to_csv('transition_table.csv', index=False)
@@ -432,7 +464,7 @@ def Draw_nfa_graph() :
     # Identify the last state as the last element of any transition that doesn't appear as the first element in any other transition
     last_states = {items[-1] for items in items if items[-1] not in first_states}
     if len(last_states) == 1:
-
+        # last_states.tolist()
         print("not common state")
     else:
         tkinter.messagebox.showerror("Information", "Ambiguous last state")
